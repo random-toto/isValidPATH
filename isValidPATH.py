@@ -73,6 +73,9 @@ def isValidPATH(chemin):
             if var in os.listdir():
                 return 0
                 # Il s'agit d'un fichier.
+            else:
+                return -1
+                # Il ne s'agit ni d'un fichier, ni d'un répertoire.
 
 """
 # Tests unitaires.
