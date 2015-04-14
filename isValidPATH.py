@@ -15,19 +15,19 @@ def isValidPATH(chemin):
     '''
     var = str(chemin)
     if var == "":
-        return False
+        return -1
     slashes = var.count('/')
     if var[-1] == '/':
         try:
             os.chdir(var)
-            return True 
+            return 1 
         except:
-            return False
+            return -1
     Liste = []
     if slashes:
         Liste = var.split('/')
     print(len(Liste))
-    Liste2 = Liste[-1]
+    lastItem = Liste[-1]
     if len(Liste) > 1:
         
         Liste.pop()
@@ -42,7 +42,7 @@ def isValidPATH(chemin):
                 except:
                     print(i)
                     return False
-    if Liste2 not in os.listdir():
+    if lastItem not in os.listdir():
         return False
-    return True
+    return 2
     
