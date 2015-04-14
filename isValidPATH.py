@@ -54,7 +54,7 @@ def isValidPATH(chemin):
             Liste = var.split('/')
             lastItem = Liste[-1]
             Liste.pop()
-            # On teste sur tous les élément de la liste saus le dernier.
+            # On teste sur tous les élément de la liste sauf le dernier.
             for i in Liste:
                 try:
                     os.chdir(str(i))
@@ -73,8 +73,7 @@ def isValidPATH(chemin):
     else:
         try:
             os.chdir(var)
-            return 1
-            #### Il s'agit d'un répertoire.
+            return 1        #### Il s'agit d'un répertoire.
         except:
             if var in os.listdir():
                 return 0        #### Il s'agit d'un fichier.
@@ -112,3 +111,76 @@ print(isValidPATH("./"))
 print(isValidPATH("test"))
 print(isValidPATH("/tmp/../tmp"))       # WARNING : Accepté.
 #"""
+
+def properPATH(chemin):
+    ''' essaie de renvoyer un chemin valide. 
+    properPATH(str()) renvoit un tuple : (PATH, FILE), avec :
+        *  PATH = False si le chemin est faux.
+        *  FILE = False si le ficher OU le chemin n'existe pas.  
+    '''
+    var = str(chemin)      # local, (and str() var)
+    if var == "":
+        return (False, False)
+    if "..." in var:
+        return (False, False)
+    if var == "." or var == ".." or var == '/':
+        return (str(var), False)
+    if var[0] == '/':
+        os.chdir('/')
+        var = var[1:]
+    slashes = var.count('/')
+    # CAS 1 : il y a des '/' restants...
+    if slashes:
+        var = var.replace('//', '/')
+        # SOUS-CAS 1 : il y a un trailing '/' => pas de nom de fichier spécifié.
+        if var[-1] == "/":
+            try:
+                os.chdir(var)
+                return (os.getcwd(), False)        #### C'est bien un répertoire.
+            except:
+                return (False, False)       #### Ce n'est pas un répertoire valide. (Au moins sur cette machine).
+        # SOUS-CAS 2 :il n'y a pas de '/' à la fin, la fin peut-être soit un fichier, soit un répertoire. 
+        else:
+            Liste = var.split('/')
+            lastItem = Liste[-1]
+            Liste.pop()
+            # On teste sur tous les élément de la liste sauf le dernier.
+            for i in Liste:
+                try:
+                    os.chdir(str(i))
+                except:
+                    return (False, False)
+            # On teste le dernier élément de la liste (à part, parce que n'ayant pas de '/' à la fin, ça peut être un fichier ou un dossier).
+            if lastItem in os.listdir():
+                try:
+                    os.chdir(str(lastItem))
+                    return (os.getcwd(), False)        #### C'est un répertoire.
+                except:
+                    return (os.getcwd(), str(lastItem))        #### C'est un fichier.
+            else:
+                return (os.getcwd(), False)       #### Le dernier élément n'est pas valide, mais le PATH si.
+    # CAS 2 : il n'y en a pas.    
+    else:
+        try:
+            os.chdir(var)
+            return (os.getcwd(), False)        #### Il s'agit d'un répertoire.
+        except:
+            if var in os.listdir():
+                return (os.getcwd(), str(var))        #### Il s'agit d'un fichier.
+            else:
+                return (False, False)       #### Il ne s'agit ni d'un fichier, ni d'un répertoire.
+#
+#"""
+print(properPATH('/tmp'))
+print(properPATH('/tmp/../tmp'))
+print(properPATH('/tmp/test'))
+print(properPATH('/tmp/azejhf'))
+print(properPATH('/'))
+print(properPATH('.'))
+print(properPATH('..'))
+print(properPATH('/tmp/'))
+print(properPATH('./test'))
+
+
+#"""
+
