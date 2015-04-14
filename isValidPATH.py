@@ -41,8 +41,8 @@ def isValidPATH(chemin):
                     os.chdir('/' + str(i))
                 except:
                     print(i)
-                    return False
+                    return -1
     if lastItem not in os.listdir():
-        return False
+        return -2
     return 2
     
