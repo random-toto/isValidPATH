@@ -170,7 +170,7 @@ def properPATH(chemin):
             else:
                 return (False, False)       #### Il ne s'agit ni d'un fichier, ni d'un répertoire.
 #
-#"""
+"""
 print(properPATH('/tmp'))
 print(properPATH('/tmp/../tmp'))
 print(properPATH('/tmp/test'))
@@ -180,7 +180,58 @@ print(properPATH('.'))
 print(properPATH('..'))
 print(properPATH('/tmp/'))
 print(properPATH('./test'))
-
-
+print(properPATH('/tmp/../tmp/./test'))     # Works. equals to /tmp/test if regular file 'test' exists.
 #"""
 
+def properPATH2file(chemin):
+    var = str(chemin) 
+    if var == "":
+        return (False, False)
+    if "..." in var:
+        return (False, False)
+    if var == "." or var == ".." or var == '/':
+        return (str(var), False)
+    if var[0] == '/':
+        os.chdir('/')
+        var = var[1:]
+    slashes = var.count('/')
+    if slashes:
+        var = var.replace('//', '/')
+        if var[-1] == "/":
+            try:
+                os.chdir(var)
+                return (os.getcwd(), False)   
+            except:
+                return (False, False) 
+        #
+        else:
+            Liste = var.split('/')
+            lastItem = Liste[-1]
+            #~ print(lastItem) #
+            Liste.pop()
+            #~ print(Liste) #
+            for i in Liste:
+                try:
+                    os.chdir(str(i))
+                except:
+                    return (False, False)
+            if lastItem in os.listdir():
+                try:
+                    os.chdir(str(lastItem))
+                    #~ print("toto")
+                    return (os.getcwd(), False) 
+                except:
+                    #~ print("tutu")
+                    return (os.getcwd(), str(lastItem))  
+            else:
+                #~ print("titi")
+                return (os.getcwd(), False, str(lastItem))   # changé par rapport à properPATH. On veut pouvoir créer un fichier, s'il n'existe pas.
+    else:
+        try:
+            os.chdir(var)
+            return (os.getcwd(), False)  
+        except:
+            if var in os.listdir():
+                return (os.getcwd(), str(var))  
+            else:
+                return (False, False)   
